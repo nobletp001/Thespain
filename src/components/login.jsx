@@ -14,8 +14,6 @@ const Login = ({setLoggedIn}) => {
      if (!email) {
           setIsError('email is required.');
 
-        } else if (!emailPattern.test(email)) {
-          setIsError('invalid email format.');
         }
         else {
           // Create a user message object
@@ -27,7 +25,7 @@ const Login = ({setLoggedIn}) => {
             console.log(response)
             if(response){
              setLoggedIn(true)
-             AsyncStorage.setItem('userEmail', email)
+          await   AsyncStorage.setItem('userEmail', email)
              }
             // Create a new array containing both the user message and the assistant's response
         

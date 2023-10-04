@@ -9,14 +9,16 @@ import {
   Alert,
   StyleSheet,
   TextInput,
-  PermissionsAndroid, Platform, ImageBackground
+  PermissionsAndroid, Platform, ImageBackground,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Voice from '@react-native-community/voice';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useGetMessageQuery, useSendTextMutation } from '../redux/api';
 import Tts from 'react-native-tts';
-import { v4 as uuidv4 } from 'uuid';
+import Clipboard from '@react-native-clipboard/clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -24,11 +26,37 @@ import { v4 as uuidv4 } from 'uuid';
 const HomeScreen = () => {
   const [result, setResult] = useState('');
   const [recording, setRecording] = useState(false);
+  const [getMail, setGetMail] = useState('')
 
+
+  const email = async () => {
+    try {
+      const e = await AsyncStorage.getItem('userEmail');
+        if(e){
+          setGetMail(e)
+        }
+    } catch (error) {
+      console.log(error);
+      // Handle the error if needed.
+    }
+  };
+
+  useEffect(() => {
+  email()
+  }, [getMail])
+  
+  const copyToClipboard = (text) => {
+    if (text) {
+        Clipboard.setString(text);
+
+        // Display a success message
+       
+    }
+};
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([]);
   const [responseText, setresponseText] = useState('')
- const {data, isLoading:loading, } = useGetMessageQuery()
+ const {data, isLoading:loading, error} = useGetMessageQuery(getMail)
  const [permissionGrated, setPermissionGrated] = useState(false)
 
 
@@ -42,14 +70,14 @@ const updatedMessages = data?.chat_history?.map((messageItem) => {
   // Transform text_input into user message format
   const userMessage = {
     role: 'user',
-    content: messageItem.text_input.trim(),
+    content: messageItem.prompt,
     id: new Date(),
   };
 
   // Transform message into assistant message format
   const assistantMessage = {
     role: 'assistant',
-    content: messageItem.message,
+    content: messageItem.completion,
     isPlaying: false,
     id: new Date(),
   };
@@ -94,7 +122,7 @@ const updateScrollView = ()=>{
     console.log('speech error: ',e);
   }
   const sendMessageVoice =async()=>{
-    if(result.trim().length>0){
+    if(result.length>0){
         let newMessages = [...messages];
         newMessages.push({role: 'user', content: result.trim(), id:new Date()});
         setMessages([...newMessages]);
@@ -104,7 +132,7 @@ const updateScrollView = ()=>{
 
        try {
         // Send the user's message to the server and await the response
-        const response = await sendText(result.trim()).unwrap();
+        const response = await sendText({text:inputText, email:getMail}).unwrap();
         if(response){
           setresponseText(response)
          }
@@ -117,7 +145,7 @@ const updateScrollView = ()=>{
   }
 
 const sendMessageText = async () => {
-  if (inputText.trim().length > 0) {
+  if (inputText.length > 0) {
     // Create a user message object
     const userMessage = { role: 'user', content: inputText.trim() , id:new Date()};
 
@@ -127,7 +155,7 @@ const sendMessageText = async () => {
 
     try {
       // Send the user's message to the server and await the response
-      const response = await sendText(inputText).unwrap();
+      const response = await sendText({text:inputText, email:getMail}).unwrap();
       if(response){
         setresponseText(response)
        }
@@ -297,7 +325,9 @@ requestPermission()
     }
   
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 " style={{
+      backgroundColor:'#0c7c54'
+    }}>
   <SafeAreaView className="flex-1 flex ">
         {/* bot icon */}
         <View style={styles.header}>
@@ -343,11 +373,14 @@ requestPermission()
                             return (
                               <View key={index}> 
                                 <View 
-                                key={index} style={{width: wp(70)}} 
-                                className="bg-emerald-100 p-2 text-black rounded-xl rounded-tl-none">
-                                <Text className="text-neutral-800" style={{fontSize: wp(4)}}  >
+                                key={index} style={{width: wp(70), backgroundColor:'#e4f7ef'}} 
+                                className=" p-2 text-black rounded-xl rounded-tl-none">
+                                  <TouchableWithoutFeedback onPress={()=> copyToClipboard(message.content)}>
+                                  <Text className="text-neutral-800" style={{fontSize: wp(4)}}  >
                                   {message.content}
                                 </Text>
+                                  </TouchableWithoutFeedback>
+                              
                               </View>
                               <View className="flex flex-row my-3 items-center justify-between">
                               {
@@ -517,14 +550,15 @@ elevation: 3,
     color:'#000'
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#84dcb4',
     paddingVertical: 10,
     alignItems: 'center',
     elevation: 5, // Add elevation for box shadow
   },
   headerText: {
     fontSize: 24,
-    color: '#000',
+    color: '#fff',
+    fontWeight:'800'
   },
   });
   

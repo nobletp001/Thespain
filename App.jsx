@@ -1,12 +1,7 @@
 import {
   View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  
-
   StyleSheet,
-  TextInput,
+
 
 } from 'react-native';
 import React, { useEffect , useState} from 'react'
@@ -18,17 +13,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Login from './src/components/login';
 
+
 const App = () => {
   const [isSplashVisible, setSplashVisible] = React.useState(true);
  const [LoggedIn,  setLoggedIn] = useState(false)
+
 
   useEffect(() => {
     // Simulate a splash screen duration (e.g., 3 seconds)
     const splashTimer = setTimeout(() => {
       setSplashVisible(false);
     }, 3000);
+  
 
-    return () => clearTimeout(splashTimer);
+    return () => {
+      clearTimeout(splashTimer)
+
+    };
   }, []);
   useEffect(() => {
     // Check AsyncStorage for the email
@@ -52,11 +53,12 @@ const App = () => {
     <View className="flex-1">
       <Provider store={store}>
       {isSplashVisible ? (
-        <SplashScreen />
+        <SplashScreen  LoggedIn={LoggedIn} />
       ) : (
        <>
        {
         LoggedIn ? <HomeScreen/> : 
+
        <Login setLoggedIn={setLoggedIn} />
        }
  

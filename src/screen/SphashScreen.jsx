@@ -2,11 +2,11 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
-const SplashScreen = () => {
+const SplashScreen = ({LoggedIn}) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/bgTask.jpg')}
+        source={LoggedIn ? require('../../assets/images/bgTask.jpg') :   require('../../assets/images/bgJ.jpg')}
         style={styles.image}
       />
     </View>

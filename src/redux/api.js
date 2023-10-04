@@ -1,16 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { formatError } from './errorHandler';
 
-const email =async()=>{
-  try {
-   const e= AsyncStorage.getItem('userEmail')
-   if(e){
-    return e
-   }
-  } catch (error) {
-    return ''
-  }
-}
 
 // Define a service using a base URL and expected endpoints
 export const textApi = createApi({
@@ -18,9 +8,9 @@ export const textApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'https://thespain.onrender.com/' }),
   endpoints: (builder) => ({
     sendText: builder.mutation({
-      query(text) {
+      query({text, email}) {
         return {
-          url: `text?email=${email()}&textinput=${text}`,
+          url: `text?email=${email}&text=${text}`,
           method: "POST"
         };
 
@@ -47,7 +37,7 @@ export const textApi = createApi({
     }),
 
     getMessage: builder.query({
-      query: () => `history/${email()}`,
+      query: (email) => `history/?email=${email}`,
       transformErrorResponse: (response, meta, arg) => ({
         message: formatError(response),
         error: formatError(response),
