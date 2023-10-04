@@ -8,29 +8,18 @@ import React, { useEffect , useState} from 'react'
 import HomeScreen from './src/screen/HomeScreen'
 import { Provider } from 'react-redux'
 import { store } from './src/redux/store'
-import SplashScreen from './src/screen/SphashScreen'
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Login from './src/components/login';
 
 
 const App = () => {
-  const [isSplashVisible, setSplashVisible] = React.useState(true);
+
  const [LoggedIn,  setLoggedIn] = useState(false)
 
 
-  useEffect(() => {
-    // Simulate a splash screen duration (e.g., 3 seconds)
-    const splashTimer = setTimeout(() => {
-      setSplashVisible(false);
-    }, 3000);
-  
 
-    return () => {
-      clearTimeout(splashTimer)
-
-    };
-  }, []);
   useEffect(() => {
     // Check AsyncStorage for the email
     AsyncStorage.getItem('userEmail')
@@ -52,10 +41,8 @@ const App = () => {
   return (
     <View className="flex-1">
       <Provider store={store}>
-      {isSplashVisible ? (
-        <SplashScreen  LoggedIn={LoggedIn} />
-      ) : (
-       <>
+     
+       
        {
         LoggedIn ? <HomeScreen/> : 
 
@@ -63,8 +50,8 @@ const App = () => {
        }
  
        
-       </>
-      )}
+       
+    
      
 
       </Provider>

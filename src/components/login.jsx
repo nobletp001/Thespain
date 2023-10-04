@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRegisterMutation } from '../redux/api'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -45,7 +45,13 @@ const Login = ({setLoggedIn}) => {
     }, [])
     
   return (
-    <View  className="flex-1 px-5 bg-white justify-center items-center">
+   <View className="flex-1">
+    <ImageBackground  source={require('../../assets/images/M.jpg')} className="flex-1">
+     <View  className="flex-1 px-5  justify-center items-center">
+    <View className="w-full">
+      <Text className="font-medium my-1 ml-1" style={{
+        fontSize:wp(5)
+      }}>Email</Text>
     <TextInput
    style={[styles.input, {
      height:hp(8),
@@ -54,6 +60,7 @@ const Login = ({setLoggedIn}) => {
    placeholder="Email"
    onChangeText={(text) => setEmail(text)}
  />
+    </View>
 <View className="mt-10 w-full justify-center items-center">
 <View className="w-full justify-center items-center">
 <Text className="text-red-700 text-xs">{isError}</Text>
@@ -67,6 +74,8 @@ const Login = ({setLoggedIn}) => {
  </TouchableOpacity>
 </View>
 </View>
+   </ImageBackground>
+   </View>
   )
 }
 
